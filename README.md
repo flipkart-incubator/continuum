@@ -14,8 +14,16 @@ Now, data can arrive unordered and late. A recent, but a small window of data ca
 ![Batch vs Stream](https://github.com/flipkart-incubator/continuum/blob/master/docs/images/continuum-stream-vs-batch-lambda.jpg)
 
 Lambda Architecture makes a discreet choices for freshness and correctness; infact it picks up 2 points to balance the freshness and correctness. There are problems with above choice:
-* most often the stream and batch are 2 different stacks and hence 2 definitions of the same processing. This leads to maintenance and operational overheads.
+* Most often the stream and batch are 2 different stacks and hence 2 definitions of the same processing. This leads to maintenance and operational overheads.
 * The 2 pipelines have to be tuned/configured to ensure that each event is processed at-least once *as and when it is received* by the respective pipeline. Example, assume that we need to join 2 streams of events e1 and e2. Suppose e1 stream stops for arbitrary amount of time. In such a case we cannot process events from stream e2 and have to wait for batch systems to pick up the processing. If e1 stream has not recovered by that time, then we would miss processing of events from e1 stream entirely. (This is depicted in above figure by regions D1 and D2; if D1 < D2, then any event that arrives after D1 duration, might not be processed by stream pipeline)
+* Re-runs are a big issue as one need to manually figure out which pipeline is required to be re-run based on the duration and the age of the data.
+* The entire system needs to be reconfigured if we need to change W1, W2 parameters for stream and batch pipelines respectively. More generically, since the system is designed to be pivoted on 2 distinct points, it cannot tolerate presence of more pipelines working at different parameters (W and S) - which might be the case if we have resource crunch. We can engineer the *Query* system to merge results from more than 2 pipelines; but we still need to manage an entirely new data pipeline as and when they are introduced.
+
+## Introducing...
+Continuum. Instead of solving the 'freshness' and 'correctness' problem by 2 different systems, we take it as a tradeoff we need to make at different point in time.
+
+
+
 
 
 
