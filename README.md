@@ -11,11 +11,11 @@ The blog presents Lambda Arch as a solution to balance availability vs consisten
 
 Now, data can arrive unordered and late. A recent, but a small window of data cannot portray the 'complete' reality. As such, a realtime system's accuracy is limited by the avilability of 'complete data' within its smaller operating window. Using a similar reason, a batch system is more accurate (and less fresh) because a larger window of data.
 
-![Batch vs Stream]()
+![Batch vs Stream](https://github.com/flipkart-incubator/continuum/blob/master/docs/images/continuum-stream-vs-batch-lambda.jpg)
 
 Lambda Architecture makes a discreet choices for freshness and correctness; infact it picks up 2 points to balance the freshness and correctness. There are problems with above choice:
 * most often the stream and batch are 2 different stacks and hence 2 definitions of the same processing. This leads to maintenance and operational overheads.
-* The 2 pipelines have to be tuned/configured to ensure that each event is processed at-least once *as and when it is received*. Example, assume that we need to join 2 streams of events e1 and e2. Suppose e1 stream stops for arbitrary amount of time. In such a case we cannot process events from stream e2 and have to wait for batch systems to pick up the processing. If e1 stream has not recovered by that time, then we would miss processing the events from e1 entirely. (This is depicted in above figure by regions D1 and D2; if D1 < D2, then any even that arrives after D1 duration, it might not be processed immediately)
+* The 2 pipelines have to be tuned/configured to ensure that each event is processed at-least once *as and when it is received* by the respective pipeline. Example, assume that we need to join 2 streams of events e1 and e2. Suppose e1 stream stops for arbitrary amount of time. In such a case we cannot process events from stream e2 and have to wait for batch systems to pick up the processing. If e1 stream has not recovered by that time, then we would miss processing of events from e1 stream entirely. (This is depicted in above figure by regions D1 and D2; if D1 < D2, then any event that arrives after D1 duration, might not be processed by stream pipeline)
 
 
 
