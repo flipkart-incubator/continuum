@@ -11,7 +11,9 @@ The blog explains the need for Lambda Arch through availability and consistency 
 
 Data can arrive unordered and late. A recent, but a small window of data cannot portray the 'complete' reality. As such, a realtime system's accuracy is limited by the avilability of 'complete data' within a recent, smaller window. For the same reason, a batch system is more accurate and less fresh because a larger window of data.
 
-Lambda Architecture makes a discreet choices for freshness and correctness; infact it picks up 2 points to balance the 2 trade-offs. 
+Lambda Architecture makes a discreet choices for freshness and correctness; infact it picks up 2 points to balance the freshness and correctness. The problems with this choice are
+* most often the stream and batch are 2 different stacks and hence 2 definitions of the same processing. This leads to maintenance and operational overheads. For example, 2 different unit tests, larger upgrade cycles whenever there is a change in data formats, resource wastage?
+* The 2 pipelines have to be tuned/configured so that they have don't leave gaps (ie data is lost because of lack of ownership).
 
 
 
