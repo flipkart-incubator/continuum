@@ -2,18 +2,21 @@
 Lambda Architecture is not enough! Continuum is more fundamental
 
 ## What is Lambda Architecture?
-Long long ago, creator of [Apache Storm](http://storm.apache.org/index.html "Apache Storm") talked about Lambad Architecture in his article [How to beat the CAP theorem] (http://nathanmarz.com/blog/how-to-beat-the-cap-theorem.html). The idea was to combine a 'batch compute - which is reliable and *more correct*' and a' stream/realtime compute - which provides better consistency'. The resulting system will be *consistent* and *reliable* - the most desirable traits in any data system.
+Long long ago, creator of [Apache Storm](http://storm.apache.org/index.html "Apache Storm"), Nathan Marz, talked about Lambda Architecture in his article [How to beat the CAP theorem] (http://nathanmarz.com/blog/how-to-beat-the-cap-theorem.html). Idea was to combine a 'batch compute - which is reliable and *more correct*' and a 'stream/realtime compute - which provides better consistency'. The resulting system will be, hypothetically, *consistent* and *reliable* - traits desired in any data system.
 
 ![Lambda Architecture](http://nathanmarz.com/storage/batch_realtime_example.png?__SQUARESPACE_CACHEVERSION=1318379033834)
 
-## If Lambda Arch is the solution, what is the problem?
-The blog explains the need for Lambda Arch through availability and consistency as trade-offs. But practically, the data systems need to make *freshness* and *correctness* trade-offs. The freshness is defined as "how realtime are the results of the computation/processing" and correctness is defined as "how accurate the results are". These tradeoffs arise because of finite storage and compute capacity. 
+## But??
+The blog presents Lambda Arch as a solution to balance availability vs consistency trade-offs. Practically, data systems need to make *freshness* vs *correctness* trade-offs. **Freshness** is defined as "how realtime are the results of the computation/processing". **Correctness** is defined as "how accurate and complete the results of a processing are". These tradeoffs arise because of finite storage and compute capacity. The freshness and correctness properties are fundamental properties of a data system whereas 'availability' and 'consistency' are properties of the solution's architecture. 
 
-Data can arrive unordered and late. A recent, but a small window of data cannot portray the 'complete' reality. As such, a realtime system's accuracy is limited by the avilability of 'complete data' within a recent, smaller window. For the same reason, a batch system is more accurate and less fresh because a larger window of data.
+Now, data can arrive unordered and late. A recent, but a small window of data cannot portray the 'complete' reality. As such, a realtime system's accuracy is limited by the avilability of 'complete data' within its smaller operating window. Using a similar reason, a batch system is more accurate (and less fresh) because a larger window of data.
 
-Lambda Architecture makes a discreet choices for freshness and correctness; infact it picks up 2 points to balance the freshness and correctness. The problems with this choice are
-* most often the stream and batch are 2 different stacks and hence 2 definitions of the same processing. This leads to maintenance and operational overheads. For example, 2 different unit tests, larger upgrade cycles whenever there is a change in data formats, resource wastage?
-* The 2 pipelines have to be tuned/configured so that they have don't leave gaps (ie data is lost because of lack of ownership).
+![Batch vs Stream]()
+
+Lambda Architecture makes a discreet choices for freshness and correctness; infact it picks up 2 points to balance the freshness and correctness. There are problems with above choice:
+* most often the stream and batch are 2 different stacks and hence 2 definitions of the same processing. This leads to maintenance and operational overheads.
+* The 2 pipelines have to be tuned/configured to ensure that each event is processed at-least once *as and when it is received*. Example, assume that we need to join 2 streams of events e1 and e2. Suppose e1 stream stops for arbitrary amount of time. In such a case we cannot process events from stream e2 and have to wait for batch systems to pick up the processing. If e1 stream has not recovered by that time, then we would miss processing the events from e1 entirely. (This is depicted in above figure by regions D1 and D2; if D1 < D2, then any even that arrives after D1 duration, it might not be processed immediately)
+
 
 
 
