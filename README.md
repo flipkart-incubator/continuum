@@ -19,9 +19,17 @@ Lambda Architecture makes a discreet choices for freshness and correctness; infa
 * Re-runs are a big issue as one need to manually figure out which pipeline is required to be re-run based on the duration and the age of the data.
 * The entire system needs to be reconfigured if we need to change W1, W2 parameters for stream and batch pipelines respectively. More generically, since the system is designed to be pivoted on 2 distinct points, it cannot tolerate presence of more pipelines working at different parameters (W and S) - which might be the case if we have resource crunch. We can engineer the *Query* system to merge results from more than 2 pipelines; but we still need to manage an entirely new data pipeline as and when they are introduced.
 
-## Introducing...
-Continuum. Instead of solving the 'freshness' and 'correctness' problem by 2 different systems, we take it as a tradeoff we need to make at different point in time.
+## [WIP] Introducing...
+Continuum. Instead of solving the 'freshness' and 'correctness' problem by 2 different systems, we take it as a tradeoff technology needs to make all the time.
+Continuum is designed to be a technology solution rather than an architecture reference.
 
+
+### Problem with Message Queues/Relays
+Mostly operational rather than scale. One which affects us most is the failure recovery. When there is a consumer failure, most often than not, messages pile up and it is essential that we recover the newest changes first and either drop the older changes or take a snapshot from the source or process the older changes in background. As such *time* become one of the dimension to track in message queues (along with message offsets).
+
+
+### Problem with Data Location
+In Lambda architecture, data can be present in the storage layer of either or both pieplines, but we cannot be sure. The data storage tech used in the stream and batch pipelines are very different and usually there is no meta data to establish relationship between them. It makes pipeline recovery inefficient (typically near-realtime pipeline) as one need to decide if they really need to process some part of data which could have already been processed by batch pipeline. Another case, where we need to reloadphysically copy data between data stores to re-process in case a bug was discovered and fixed at a later point in time.
 
 
 
