@@ -2,14 +2,14 @@
 Lambda Architecture is not enough! Continuum is more fundamental
 
 ## What is Lambda Architecture?
-Long long ago, creator of [Apache Storm](http://storm.apache.org/index.html "Apache Storm"), Nathan Marz, talked about Lambda Architecture in his article [How to beat the CAP theorem] (http://nathanmarz.com/blog/how-to-beat-the-cap-theorem.html). Idea was to combine a 'batch compute - which is reliable and *more correct*' and a 'stream/realtime compute - which provides better consistency'. The resulting system will be, hypothetically, *consistent* and *reliable* - traits desired in any data system.
+Long long ago, creator of [Apache Storm](http://storm.apache.org/index.html "Apache Storm"), Nathan Marz, talked about Lambda Architecture in his article [How to beat the CAP theorem] (http://nathanmarz.com/blog/how-to-beat-the-cap-theorem.html). His idea was to combine a 'batch compute' with a 'stream/realtime compute' to combine the goodness of the two - provide better reliability and consistency respectively.
 
 ![Lambda Architecture](http://nathanmarz.com/storage/batch_realtime_example.png?__SQUARESPACE_CACHEVERSION=1318379033834)
 
 ## But??
-The blog presents Lambda Arch as a solution to balance availability vs consistency trade-offs. Practically, data systems need to make *freshness* vs *correctness* trade-offs. **Freshness** is defined as "how realtime are the results of the computation/processing". **Correctness** is defined as "how accurate and complete the results of a processing are". These tradeoffs arise because of finite storage and compute capacity. The freshness and correctness properties are fundamental properties of a data system whereas 'availability' and 'consistency' are properties of the solution's architecture. 
+The blog presents Lambda Arch as a solution to balance availability vs consistency trade-offs. Practically, data systems need to make *freshness* vs *correctness* trade-offs (because storage and compute capacities are finite). **Freshness** is defined as "how realtime are the results of the computation". **Correctness** is defined as "how accurate and complete the results of a computation are". The freshness and correctness are fundamental properties of data systems whereas 'availability' and 'consistency' are properties of the solution's architecture.
 
-Now, data can arrive unordered and late. A recent, but a small window of data cannot portray the 'complete' reality. As such, a realtime system's accuracy is limited by the avilability of 'complete data' within its smaller operating window. Using a similar reason, a batch system is more accurate (and less fresh) because a larger window of data.
+Now, data can arrive unordered and late. A recent, but a small window of data cannot portray the 'complete' reality. As such, a realtime system's accuracy is limited by the availability of 'complete data' within its smaller operating window. Using a similar reason, a batch system is more accurate (and less fresh) because it operates on a larger window of data.
 
 ![Batch vs Stream](https://github.com/flipkart-incubator/continuum/blob/master/docs/images/continuum-stream-vs-batch-lambda.jpg)
 
@@ -19,20 +19,21 @@ Lambda Architecture makes a discreet choices for freshness and correctness; infa
 * Re-runs are a big issue as one need to manually figure out which pipeline is required to be re-run based on the duration and the age of the data.
 * The entire system needs to be reconfigured if we need to change W1, W2 parameters for stream and batch pipelines respectively. More generically, since the system is designed to be pivoted on 2 distinct points, it cannot tolerate presence of more pipelines working at different parameters (W and S) - which might be the case if we have resource crunch. We can engineer the *Query* system to merge results from more than 2 pipelines; but we still need to manage an entirely new data pipeline as and when they are introduced.
 
-## [WIP] Introducing...
+## Introducing...
 Continuum. Instead of solving the 'freshness' and 'correctness' problem by 2 different systems, we take it as a tradeoff technology needs to make all the time.
-Continuum is designed to be a technology solution rather than an architecture reference.
-
+Continuum is designed to be a technology solution rather than an architecture reference. The design of continuum should solve for following problems:
 
 ### Problem with Message Queues/Relays
-Mostly operational rather than scale. One which affects us most is the failure recovery. When there is a consumer failure, most often than not, messages pile up and it is essential that we recover the newest changes first and either drop the older changes or take a snapshot from the source or process the older changes in background. As such *time* become one of the dimension to track in message queues (along with message offsets).
+Most queues have solve the problems of scale, but have largely ignored the solutions for failure recovery.
+Message pile up in case of consumer failure is one of the classic problems. It is essential that we recover the newest changes first when recovering from failure and either drop older changes or process the older changes in background. As such *time* become one of the dimension to track in message queues (along with message offsets).
 
+### Heisenberg Data
+In Lambda architecture, data can be present in the storage layer of either or both pipelines - but one cannot be sure. Data storage tech used in stream and batch pipelines are very different and there is no metadata to maintain relationship between them. Effectively, we want a tenured data storage where stream data storage (eg: Kafka) contains fresh data and batch data storage (eg: HDFS) contains old data. This calls for fine tuning stream and batch data store retentions such that data is available on at least one storage in case of failures.
 
-### Problem with Data Location
-In Lambda architecture, data can be present in the storage layer of either or both pieplines, but we cannot be sure. The data storage tech used in the stream and batch pipelines are very different and usually there is no meta data to establish relationship between them. It makes pipeline recovery inefficient (typically near-realtime pipeline) as one need to decide if they really need to process some part of data which could have already been processed by batch pipeline. Another case, where we need to reloadphysically copy data between data stores to re-process in case a bug was discovered and fixed at a later point in time.
+### Processing Abstraction
+Keeping 2 or more versions of the same processing logic in multiple languages is tough. Not a critical problem, though, as there solutions like [summingbird](https://github.com/twitter/summingbird).
 
+### Stateful processing - Joins
+Lambda architecture doesn't talk about joins. And often we solve joins differently in stream vs batch world. But if you think about it, the problem is only partially solved in batch systems by the virtue of larger data window. For starters, we need to provide a join solution that helps provide a visibility into the incomplete joins and provide a configuration to control the join windows.
 
-
-
-
-
+## [WIP] Design and Architecture
