@@ -34,6 +34,6 @@ In Lambda architecture, data can be present in the storage layer of either or bo
 Keeping 2 or more versions of the same processing logic in multiple languages is tough. Not a critical problem, though, as there solutions like [summingbird](https://github.com/twitter/summingbird).
 
 ### Stateful processing - Joins
-Lambda architecture doesn't talk about joins. And often we solve joins differently in stream vs batch world. But if you think about it, the problem is only partially solved in batch systems by the virtue of larger data window. For starters, we need to provide a join solution that helps provide a visibility into the incomplete joins and provide a configuration to control the join windows.
+Lambda architecture doesn't talk about joins. The solution to join problem can look different in Stream and Batch pipelines. For starters, we need to find solution that provides visibility into incomplete joins and ability to join incrementally as the data arrive.
 
 ## [WIP] Design and Architecture
