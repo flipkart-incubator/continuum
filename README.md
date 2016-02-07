@@ -37,3 +37,4 @@ Keeping 2 or more versions of the same processing logic in multiple languages is
 Lambda architecture doesn't talk about joins. The solution to join problem can look different in Stream and Batch pipelines. For starters, we need to find solution that provides visibility into incomplete joins and ability to join incrementally as the data arrive.
 
 ## [WIP] Design and Architecture
+* [Design][wiki/Design-Doc]
