@@ -11,7 +11,7 @@ The blog presents Lambda Arch as a solution to balance availability vs consisten
 
 Now, data can arrive unordered and late. A recent, but a small window of data cannot portray the 'complete' reality. As such, a realtime system's accuracy is limited by the availability of 'complete data' within its smaller operating window. Using a similar reason, a batch system is more accurate (and less fresh) because it operates on a larger window of data.
 
-![Batch vs Stream](https://github.com/flipkart-incubator/continuum/blob/master/docs/images/continuum-stream-vs-batch-lambda.jpg)
+<img src="https://github.com/flipkart-incubator/continuum/blob/master/docs/images/continuum-stream-vs-batch-lambda.jpg" alt="Batch vs Stream" width=384 height=400 />
 
 Lambda Architecture makes a discreet choices for freshness and correctness; infact it picks up 2 points to balance the freshness and correctness. There are problems with above choice:
 * Most often the stream and batch are 2 different stacks and hence 2 definitions of the same processing. This leads to maintenance and operational overheads.
